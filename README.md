@@ -25,12 +25,15 @@ Three.js is vendored in `lib/`, so the simulator works fully offline.
 ## How to fly
 
 1. Hold **Shift** for full throttle and roll down the runway.
-2. At about **120 km/h**, hold **W** (or **↑**) to rotate and lift off.
+2. At about **120 km/h**, hold **S** (or **↓**) to pull back and lift off.
 3. Ease off and climb — watch your airspeed: below ~95 km/h the wings stall.
+
+Pitch follows the joystick convention: `S`/`↓` pulls the stick back
+(nose up), `W`/`↑` pushes it forward (nose down).
 
 | Key | Action |
 | --- | --- |
-| `W` / `S` or `↑` / `↓` | Pitch (nose up / down) |
+| `W` / `S` or `↑` / `↓` | Pitch (stick forward / stick back) |
 | `A` / `D` or `←` / `→` | Roll |
 | `Q` / `E` | Rudder / ground steering |
 | `Shift` / `Ctrl` | Throttle up / down |

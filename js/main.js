@@ -43,7 +43,7 @@ window.addEventListener('keydown', (e) => {
     aircraft.reset();
     controls.throttle = 0;
     hideMessage();
-    showMessage('READY', 'Full throttle (hold Shift), rotate at 120 km/h', 3500);
+    showMessage('READY', 'Full throttle (hold Shift), pull up (hold S) at 120 km/h', 3500);
   }
 });
 
@@ -91,7 +91,7 @@ function updateCamera(dt) {
 let wasCrashed = false;
 let lastTime = performance.now();
 
-showMessage('READY', 'Full throttle (hold Shift), rotate at 120 km/h', 5000);
+showMessage('READY', 'Full throttle (hold Shift), pull up (hold S) at 120 km/h', 5000);
 
 // If no key press ever reaches the page, keyboard focus is probably
 // elsewhere (address bar, embedded preview) — tell the user what to do.

@@ -34,9 +34,11 @@ export class Controls {
   }
 
   update(dt) {
+    // Joystick convention: pushing the stick forward (W / up arrow) drops
+    // the nose; pulling back (S / down arrow) raises it.
     const target = {
-      pitch: (isPressed('KeyS') || isPressed('ArrowDown') ? -1 : 0) +
-             (isPressed('KeyW') || isPressed('ArrowUp') ? 1 : 0),
+      pitch: (isPressed('KeyW') || isPressed('ArrowUp') ? -1 : 0) +
+             (isPressed('KeyS') || isPressed('ArrowDown') ? 1 : 0),
       roll:  (isPressed('KeyA') || isPressed('ArrowLeft') ? -1 : 0) +
              (isPressed('KeyD') || isPressed('ArrowRight') ? 1 : 0),
       yaw:   (isPressed('KeyQ') ? -1 : 0) + (isPressed('KeyE') ? 1 : 0),
