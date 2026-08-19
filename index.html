@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flight Simulator</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background: #0a0e14;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      user-select: none;
+    }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; }
+
+    /* ---------- HUD ---------- */
+    #hud {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      color: #9fe8a8;
+      text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    }
+    .hud-panel {
+      position: absolute;
+      background: rgba(8, 16, 12, 0.55);
+      border: 1px solid rgba(159, 232, 168, 0.35);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      backdrop-filter: blur(2px);
+    }
+    #hud-left { left: 16px; bottom: 16px; min-width: 180px; }
+    #hud-right { right: 16px; bottom: 16px; text-align: right; min-width: 150px; }
+    .hud-value { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .hud-label { font-size: 11px; opacity: 0.75; letter-spacing: 1px; text-transform: uppercase; }
+
+    #throttle-bar {
+      width: 120px; height: 8px;
+      border: 1px solid rgba(159, 232, 168, 0.5);
+      border-radius: 4px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    #throttle-fill { height: 100%; width: 0%; background: #9fe8a8; transition: width 0.1s; }
+
+    #center-message {
+      position: absolute;
+      top: 22%;
+      width: 100%;
+      text-align: center;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #ffd27a;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #center-message.visible { opacity: 1; }
+    #center-message .sub { display: block; font-size: 15px; font-weight: 400; margin-top: 8px; color: #cfe7d2; }
+
+    #stall-warning {
+      position: absolute;
+      top: 14%;
+      width: 100%;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ff5a5a;
+      display: none;
+      animation: blink 0.5s steps(2) infinite;
+    }
+    #stall-warning.visible { display: block; }
+    @keyframes blink { 50% { opacity: 0.15; } }
+
+    #help {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      font-size: 12.5px;
+      line-height: 1.7;
+      max-width: 260px;
+    }
+    #help h3 { margin: 0 0 6px; font-size: 13px; letter-spacing: 1px; color: #ffd27a; }
+    #help kbd {
+      display: inline-block;
+      min-width: 16px;
+      padding: 0 5px;
+      border: 1px solid rgba(159, 232, 168, 0.5);
+      border-radius: 3px;
+      text-align: center;
+      font-family: inherit;
+      font-size: 11.5px;
+      margin-right: 2px;
+    }
+    #help.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="hud">
+    <div id="help" class="hud-panel">
+      <h3>FLIGHT CONTROLS</h3>
+      <div><kbd>W</kbd>/<kbd>S</kbd> or <kbd>&uarr;</kbd>/<kbd>&darr;</kbd> pitch</div>
+      <div><kbd>A</kbd>/<kbd>D</kbd> or <kbd>&larr;</kbd>/<kbd>&rarr;</kbd> roll</div>
+      <div><kbd>Q</kbd>/<kbd>E</kbd> rudder</div>
+      <div><kbd>Shift</kbd>/<kbd>Ctrl</kbd> throttle</div>
+      <div><kbd>C</kbd> camera &nbsp; <kbd>R</kbd> reset &nbsp; <kbd>H</kbd> hide help</div>
+      <div style="margin-top:6px; opacity:0.7">Full throttle, then pull up past 120 km/h.</div>
+    </div>
+
+    <div id="hud-left" class="hud-panel">
+      <div class="hud-label">Airspeed</div>
+      <div class="hud-value"><span id="speed">0</span> km/h</div>
+      <div class="hud-label" style="margin-top:6px">Throttle</div>
+      <div id="throttle-bar"><div id="throttle-fill"></div></div>
+    </div>
+
+    <div id="hud-right" class="hud-panel">
+      <div class="hud-label">Altitude</div>
+      <div class="hud-value"><span id="altitude">0</span> m</div>
+      <div class="hud-label" style="margin-top:6px">Heading</div>
+      <div class="hud-value"><span id="heading">0</span>&deg;</div>
+      <div class="hud-label" style="margin-top:6px">Vertical speed</div>
+      <div><span id="vspeed">0</span> m/s</div>
+    </div>
+
+    <div id="stall-warning">STALL</div>
+    <div id="center-message"></div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
