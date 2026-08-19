@@ -27,6 +27,7 @@ export class Aircraft {
     this.mesh = buildAircraftMesh();
     this.prop = this.mesh.userData.prop;
     this.lastThrottle = 0;
+    addWingGuns(this.mesh);
     scene.add(this.mesh);
 
     this.position = new THREE.Vector3();
@@ -214,6 +215,18 @@ export class Aircraft {
 
   setThrottleVisual(throttle) {
     this.lastThrottle = throttle;
+  }
+}
+
+// Paintball gun barrels, halfway out on each wing, pointing forward.
+function addWingGuns(mesh) {
+  const gunGeo = new THREE.CylinderGeometry(0.09, 0.11, 1.4, 6);
+  const gunMat = new THREE.MeshLambertMaterial({ color: 0x2a2e33 });
+  for (const side of [-1, 1]) {
+    const gun = new THREE.Mesh(gunGeo, gunMat);
+    gun.rotation.x = Math.PI / 2;
+    gun.position.set(3.25 * side, 0.45, -1.0);
+    mesh.add(gun);
   }
 }
 

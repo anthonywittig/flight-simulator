@@ -35,6 +35,11 @@ export class Traffic {
     for (const p of this.planes) p.update(dt, playerPos);
   }
 
+  // Remove all paint splats from every plane (fresh round).
+  clearPaint() {
+    for (const p of this.planes) p.clearSplats();
+  }
+
   // Distance from `pos` to the nearest live NPC.
   nearestDistance(pos) {
     let min = Infinity;
@@ -64,6 +69,7 @@ class NPCPlane {
     this.crashed = false;
     this.respawnTimer = 0;
     this.velocity = new THREE.Vector3(); // used only while falling
+    this.splats = []; // paint marks attached to the mesh
 
     this.respawn(new THREE.Vector3());
   }
@@ -90,6 +96,21 @@ class NPCPlane {
     this.retargetTimer = 2 + Math.random() * 6;
     this.crashed = false;
     this.syncMesh(0);
+  }
+
+  // A paintball hit: jink away and shed some altitude discipline.
+  startle() {
+    this.targetHeading = this.heading + (Math.random() - 0.5) * 2.5;
+    this.targetAlt += (Math.random() - 0.5) * 180;
+    this.retargetTimer = 3 + Math.random() * 5;
+  }
+
+  clearSplats() {
+    for (const s of this.splats) {
+      this.mesh.remove(s);
+      s.material.dispose();
+    }
+    this.splats.length = 0;
   }
 
   crash() {

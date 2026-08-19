@@ -4,7 +4,8 @@ import * as THREE from '../lib/three.module.min.js';
 import { buildWorld, getTerrainHeight } from './world.js';
 import { Aircraft } from './aircraft.js';
 import { Traffic } from './traffic.js';
-import { Controls, hasSeenInput } from './controls.js';
+import { Controls, hasSeenInput, isPressed } from './controls.js';
+import { PaintballGuns } from './paintball.js';
 import { SoundManager } from './audio.js';
 import { updateHUD, showMessage, hideMessage, toggleHelp } from './hud.js';
 
@@ -22,9 +23,10 @@ const controls = new Controls();
 const sound = new SoundManager();
 const traffic = new Traffic(scene, 5);
 traffic.scatter(aircraft.position);
+const guns = new PaintballGuns(scene);
 
 // Handy for debugging from the browser console.
-window.__sim = { aircraft, controls, sound, traffic };
+window.__sim = { aircraft, controls, sound, traffic, guns };
 
 // Camera modes: chase, cockpit, flyby tower.
 const CAMERA_MODES = ['chase', 'cockpit', 'orbit'];
@@ -45,6 +47,8 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'KeyR') {
     aircraft.reset();
     traffic.scatter(aircraft.position);
+    traffic.clearPaint();
+    guns.reset();
     controls.throttle = 0;
     hideMessage();
     showMessage('READY', 'Full throttle (hold Shift), pull up (hold S) at 120 km/h', 3500);
@@ -116,6 +120,8 @@ function tick(now) {
   aircraft.setThrottleVisual(controls.throttle);
   aircraft.update(dt, controls);
   traffic.update(dt, aircraft.position);
+  if (isPressed('Space') && !aircraft.crashed) guns.tryFire(aircraft, sound);
+  guns.update(dt, traffic, sound);
   sound.update(dt, aircraft, controls);
 
   // Mid-air collision with NPC traffic takes both planes down.
@@ -138,7 +144,7 @@ function tick(now) {
 
   updateCamera(dt);
   updateHUD(aircraft, controls, getTerrainHeight(aircraft.position.x, aircraft.position.z),
-    traffic.nearestDistance(aircraft.position));
+    traffic.nearestDistance(aircraft.position), guns.hits);
   renderer.render(scene, camera);
 }
 

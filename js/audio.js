@@ -110,6 +110,18 @@ export class SoundManager {
     }
   }
 
+  // Paintball gun pop.
+  shoot() {
+    if (!this.ctx) return;
+    this.playBurst(0.06, 0.18, 1500);
+  }
+
+  // Wet paint splat on a hit.
+  splat() {
+    if (!this.ctx) return;
+    this.playBurst(0.16, 0.35, 550);
+  }
+
   // Short filtered-noise burst; harder landings are louder and darker.
   thump(sinkRate) {
     if (!this.ctx) return;
