@@ -60,6 +60,16 @@ The physics are simplified but real forces, computed every frame:
 - Ground handling: rudder steering, rolling friction, brakes at idle
   throttle, and crash detection based on sink rate and attitude.
 
+### NPC traffic
+
+Five AI planes in different paint schemes wander the sky near you, flying
+banked turns and gentle climbs with terrain avoidance. If one drifts too
+far away it is recycled back into your vicinity, so there's always company.
+An amber **TRAFFIC** warning flashes when another plane is within 300 m —
+mid-air collisions take both planes down.
+
+### Sound
+
 All sound is synthesized live with the Web Audio API (no audio files): an
 engine drone that spools with throttle, wind noise that builds with
 airspeed, a stall warning beeper, a touchdown thump scaled by landing
@@ -72,6 +82,7 @@ index.html        page shell, HUD markup and styles
 js/main.js        renderer, cameras, game loop
 js/aircraft.js    aircraft mesh + flight physics
 js/world.js       terrain (value-noise heightfield), runway, trees, clouds
+js/traffic.js     NPC planes that wander near the player
 js/controls.js    keyboard input with smoothed control axes
 js/audio.js       synthesized engine/wind/warning sounds (Web Audio API)
 js/hud.js         HUD/DOM updates

@@ -71,11 +71,20 @@ export class Aircraft {
     return deg;
   }
 
+  // Puts the aircraft in the crashed state. Any remaining velocity is kept,
+  // so a mid-air crash tumbles down to the ground.
+  crash() {
+    this.crashed = true;
+  }
+
   update(dt, controls) {
     // Sink rate of a touchdown that happened this frame (0 = none); the
     // main loop reads it to play a landing thump.
     this.justLanded = 0;
-    if (this.crashed) return;
+    if (this.crashed) {
+      updateCrashFall(this, dt);
+      return;
+    }
 
     const wasAirborne = !this.onGround;
     const speed = this.speed;
@@ -163,7 +172,7 @@ export class Aircraft {
       const levelEnough = this.up.y > 0.85;
 
       if (sinkRate > 8 || !levelEnough || (!onRunway && sinkRate > 3.5)) {
-        this.crashed = true;
+        this.crash();
         this.velocity.set(0, 0, 0);
         this.position.y = groundY;
         this.syncMesh();
@@ -208,11 +217,28 @@ export class Aircraft {
   }
 }
 
-function buildAircraftMesh() {
+// Tumble a crashed aircraft down to the terrain under gravity.
+function updateCrashFall(aircraft, dt) {
+  const restY = getTerrainHeight(aircraft.position.x, aircraft.position.z) + TUNING.gearHeight;
+  if (aircraft.position.y <= restY + 0.1) return;
+
+  aircraft.velocity.y -= G * dt;
+  aircraft.velocity.multiplyScalar(Math.max(0, 1 - 0.5 * dt));
+  aircraft.position.addScaledVector(aircraft.velocity, dt);
+  if (aircraft.position.y < restY) {
+    aircraft.position.y = restY;
+    aircraft.velocity.set(0, 0, 0);
+  }
+  const tumble = new THREE.Quaternion().setFromAxisAngle(aircraft.right, -1.4 * dt);
+  aircraft.quaternion.premultiply(tumble).normalize();
+  aircraft.syncMesh();
+}
+
+export function buildAircraftMesh({ body = 0xd8dde3, accent = 0xc23b22 } = {}) {
   const plane = new THREE.Group();
 
-  const bodyMat = new THREE.MeshLambertMaterial({ color: 0xd8dde3 });
-  const accentMat = new THREE.MeshLambertMaterial({ color: 0xc23b22 });
+  const bodyMat = new THREE.MeshLambertMaterial({ color: body });
+  const accentMat = new THREE.MeshLambertMaterial({ color: accent });
   const darkMat = new THREE.MeshLambertMaterial({ color: 0x2a2e33 });
 
   // Fuselage: tapered box.

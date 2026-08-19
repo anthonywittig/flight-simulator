@@ -3,6 +3,7 @@
 import * as THREE from '../lib/three.module.min.js';
 import { buildWorld, getTerrainHeight } from './world.js';
 import { Aircraft } from './aircraft.js';
+import { Traffic } from './traffic.js';
 import { Controls, hasSeenInput } from './controls.js';
 import { SoundManager } from './audio.js';
 import { updateHUD, showMessage, hideMessage, toggleHelp } from './hud.js';
@@ -19,9 +20,11 @@ buildWorld(scene);
 const aircraft = new Aircraft(scene);
 const controls = new Controls();
 const sound = new SoundManager();
+const traffic = new Traffic(scene, 5);
+traffic.scatter(aircraft.position);
 
 // Handy for debugging from the browser console.
-window.__sim = { aircraft, controls, sound };
+window.__sim = { aircraft, controls, sound, traffic };
 
 // Camera modes: chase, cockpit, flyby tower.
 const CAMERA_MODES = ['chase', 'cockpit', 'orbit'];
@@ -41,6 +44,7 @@ window.addEventListener('keydown', (e) => {
   }
   if (e.code === 'KeyR') {
     aircraft.reset();
+    traffic.scatter(aircraft.position);
     controls.throttle = 0;
     hideMessage();
     showMessage('READY', 'Full throttle (hold Shift), pull up (hold S) at 120 km/h', 3500);
@@ -111,7 +115,19 @@ function tick(now) {
   controls.update(dt);
   aircraft.setThrottleVisual(controls.throttle);
   aircraft.update(dt, controls);
+  traffic.update(dt, aircraft.position);
   sound.update(dt, aircraft, controls);
+
+  // Mid-air collision with NPC traffic takes both planes down.
+  if (!aircraft.crashed) {
+    for (const npc of traffic.planes) {
+      if (!npc.crashed && npc.position.distanceTo(aircraft.position) < 11) {
+        npc.crash();
+        aircraft.crash();
+        break;
+      }
+    }
+  }
 
   if (aircraft.justLanded > 0) sound.thump(aircraft.justLanded);
   if (aircraft.crashed && !wasCrashed) {
@@ -121,7 +137,8 @@ function tick(now) {
   wasCrashed = aircraft.crashed;
 
   updateCamera(dt);
-  updateHUD(aircraft, controls, getTerrainHeight(aircraft.position.x, aircraft.position.z));
+  updateHUD(aircraft, controls, getTerrainHeight(aircraft.position.x, aircraft.position.z),
+    traffic.nearestDistance(aircraft.position));
   renderer.render(scene, camera);
 }
 
