@@ -2,8 +2,16 @@
 // gradually instead of snapping to full deflection.
 
 const keys = new Set();
+let seenInput = false;
+
+// True once any keyboard input has reached the page — used to detect
+// focus problems (e.g. the address bar still has keyboard focus).
+export function hasSeenInput() {
+  return seenInput;
+}
 
 window.addEventListener('keydown', (e) => {
+  seenInput = true;
   keys.add(e.code);
   // Keep the page from scrolling with arrows/space.
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
@@ -44,8 +52,8 @@ export class Controls {
     }
 
     const throttleRate = 0.5;
-    if (isPressed('ShiftLeft') || isPressed('ShiftRight')) this.throttle += throttleRate * dt;
-    if (isPressed('ControlLeft') || isPressed('ControlRight')) this.throttle -= throttleRate * dt;
+    if (isPressed('ShiftLeft') || isPressed('ShiftRight') || isPressed('Equal')) this.throttle += throttleRate * dt;
+    if (isPressed('ControlLeft') || isPressed('ControlRight') || isPressed('Minus')) this.throttle -= throttleRate * dt;
     this.throttle = Math.min(1, Math.max(0, this.throttle));
   }
 }

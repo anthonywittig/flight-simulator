@@ -6,6 +6,7 @@ const el = {
   heading: document.getElementById('heading'),
   vspeed: document.getElementById('vspeed'),
   throttleFill: document.getElementById('throttle-fill'),
+  throttlePct: document.getElementById('throttle-pct'),
   stall: document.getElementById('stall-warning'),
   message: document.getElementById('center-message'),
   help: document.getElementById('help'),
@@ -19,7 +20,9 @@ export function updateHUD(aircraft, controls, groundHeight) {
   el.heading.textContent = Math.round(aircraft.heading);
   const vs = aircraft.velocity.y;
   el.vspeed.textContent = (vs >= 0 ? '+' : '') + vs.toFixed(1);
-  el.throttleFill.style.width = `${Math.round(controls.throttle * 100)}%`;
+  const pct = Math.round(controls.throttle * 100);
+  el.throttleFill.style.width = `${pct}%`;
+  el.throttlePct.textContent = `${pct}%`;
   el.stall.classList.toggle('visible', aircraft.stalling && !aircraft.crashed);
 }
 

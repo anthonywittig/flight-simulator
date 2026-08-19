@@ -3,7 +3,8 @@
 import * as THREE from '../lib/three.module.min.js';
 import { buildWorld, getTerrainHeight } from './world.js';
 import { Aircraft } from './aircraft.js';
-import { Controls } from './controls.js';
+import { Controls, hasSeenInput } from './controls.js';
+import { SoundManager } from './audio.js';
 import { updateHUD, showMessage, hideMessage, toggleHelp } from './hud.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -17,9 +18,10 @@ const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerH
 buildWorld(scene);
 const aircraft = new Aircraft(scene);
 const controls = new Controls();
+const sound = new SoundManager();
 
 // Handy for debugging from the browser console.
-window.__sim = { aircraft, controls };
+window.__sim = { aircraft, controls, sound };
 
 // Camera modes: chase, cockpit, flyby tower.
 const CAMERA_MODES = ['chase', 'cockpit', 'orbit'];
@@ -34,6 +36,9 @@ window.addEventListener('resize', () => {
 window.addEventListener('keydown', (e) => {
   if (e.code === 'KeyC') cameraMode = (cameraMode + 1) % CAMERA_MODES.length;
   if (e.code === 'KeyH') toggleHelp();
+  if (e.code === 'KeyM') {
+    showMessage(sound.toggleMute() ? 'SOUND OFF' : 'SOUND ON', '', 1200);
+  }
   if (e.code === 'KeyR') {
     aircraft.reset();
     controls.throttle = 0;
@@ -88,6 +93,15 @@ let lastTime = performance.now();
 
 showMessage('READY', 'Full throttle (hold Shift), rotate at 120 km/h', 5000);
 
+// If no key press ever reaches the page, keyboard focus is probably
+// elsewhere (address bar, embedded preview) — tell the user what to do.
+window.focus();
+setTimeout(() => {
+  if (!hasSeenInput()) {
+    showMessage('NO KEYBOARD INPUT', 'Click the page once, then hold Shift for throttle', 8000);
+  }
+}, 8000);
+
 function tick(now) {
   requestAnimationFrame(tick);
   // Clamp dt so tab-switches don't teleport the plane.
@@ -97,9 +111,12 @@ function tick(now) {
   controls.update(dt);
   aircraft.setThrottleVisual(controls.throttle);
   aircraft.update(dt, controls);
+  sound.update(dt, aircraft, controls);
 
+  if (aircraft.justLanded > 0) sound.thump(aircraft.justLanded);
   if (aircraft.crashed && !wasCrashed) {
     showMessage('CRASHED', 'Press R to reset');
+    sound.crash();
   }
   wasCrashed = aircraft.crashed;
 

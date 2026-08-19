@@ -72,8 +72,12 @@ export class Aircraft {
   }
 
   update(dt, controls) {
+    // Sink rate of a touchdown that happened this frame (0 = none); the
+    // main loop reads it to play a landing thump.
+    this.justLanded = 0;
     if (this.crashed) return;
 
+    const wasAirborne = !this.onGround;
     const speed = this.speed;
     const forward = this.forward;
     const up = this.up;
@@ -167,6 +171,7 @@ export class Aircraft {
       }
 
       // Touch down / roll.
+      if (wasAirborne) this.justLanded = Math.max(0.5, sinkRate);
       this.position.y = groundY;
       if (this.velocity.y < 0) this.velocity.y = 0;
       this.onGround = true;

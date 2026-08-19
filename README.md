@@ -36,6 +36,7 @@ Three.js is vendored in `lib/`, so the simulator works fully offline.
 | `Shift` / `Ctrl` | Throttle up / down |
 | `C` | Cycle camera (chase / cockpit / orbit) |
 | `R` | Reset to the runway |
+| `M` | Mute / unmute sound |
 | `H` | Toggle the help panel |
 
 Landing: line up with the runway, throttle back, and touch down gently —
@@ -56,6 +57,11 @@ The physics are simplified but real forces, computed every frame:
 - Ground handling: rudder steering, rolling friction, brakes at idle
   throttle, and crash detection based on sink rate and attitude.
 
+All sound is synthesized live with the Web Audio API (no audio files): an
+engine drone that spools with throttle, wind noise that builds with
+airspeed, a stall warning beeper, a touchdown thump scaled by landing
+hardness, and a crash boom.
+
 ## Project layout
 
 ```
@@ -64,6 +70,7 @@ js/main.js        renderer, cameras, game loop
 js/aircraft.js    aircraft mesh + flight physics
 js/world.js       terrain (value-noise heightfield), runway, trees, clouds
 js/controls.js    keyboard input with smoothed control axes
+js/audio.js       synthesized engine/wind/warning sounds (Web Audio API)
 js/hud.js         HUD/DOM updates
 lib/              vendored Three.js (r160)
 ```
