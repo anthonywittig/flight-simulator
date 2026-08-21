@@ -36,6 +36,7 @@ Pitch follows the joystick convention: `S`/`↓` pulls the stick back
 | `W` / `S` or `↑` / `↓` | Pitch (stick forward / stick back) |
 | `A` / `D` or `←` / `→` | Roll |
 | `Q` / `E` | Rudder / ground steering |
+| `Space` | Fire paintball guns |
 | `Shift` / `Ctrl` | Throttle up / down |
 | `C` | Cycle camera (chase / cockpit / orbit) |
 | `R` | Reset to the runway |
@@ -68,6 +69,15 @@ far away it is recycled back into your vicinity, so there's always company.
 An amber **TRAFFIC** warning flashes when another plane is within 300 m —
 mid-air collisions take both planes down.
 
+### Paintball guns
+
+Your plane carries a paintball gun halfway out on each wing, firing
+straight ahead (hold `Space`; the wings alternate). Paintballs fly a real
+ballistic arc — they inherit your speed and drop with gravity — and when
+one hits another plane it leaves a colorful splat right where it struck.
+Splats accumulate (up to 40 per plane) and hit planes jink away, startled.
+The HUD counts your hits; `R` starts a fresh round and washes everyone off.
+
 ### Sound
 
 All sound is synthesized live with the Web Audio API (no audio files): an
@@ -83,6 +93,7 @@ js/main.js        renderer, cameras, game loop
 js/aircraft.js    aircraft mesh + flight physics
 js/world.js       terrain (value-noise heightfield), runway, trees, clouds
 js/traffic.js     NPC planes that wander near the player
+js/paintball.js   wing guns, paintball ballistics, splat marks
 js/controls.js    keyboard input with smoothed control axes
 js/audio.js       synthesized engine/wind/warning sounds (Web Audio API)
 js/hud.js         HUD/DOM updates

@@ -7,6 +7,7 @@ const el = {
   vspeed: document.getElementById('vspeed'),
   throttleFill: document.getElementById('throttle-fill'),
   throttlePct: document.getElementById('throttle-pct'),
+  hits: document.getElementById('hits'),
   stall: document.getElementById('stall-warning'),
   traffic: document.getElementById('traffic-warning'),
   message: document.getElementById('center-message'),
@@ -15,7 +16,7 @@ const el = {
 
 let messageTimer = null;
 
-export function updateHUD(aircraft, controls, groundHeight, nearestTraffic = Infinity) {
+export function updateHUD(aircraft, controls, groundHeight, nearestTraffic = Infinity, hits = 0) {
   el.speed.textContent = Math.round(aircraft.speed * 3.6);
   el.altitude.textContent = Math.round(Math.max(0, aircraft.position.y - groundHeight));
   el.heading.textContent = Math.round(aircraft.heading);
@@ -27,6 +28,7 @@ export function updateHUD(aircraft, controls, groundHeight, nearestTraffic = Inf
   el.stall.classList.toggle('visible', aircraft.stalling && !aircraft.crashed);
   el.traffic.classList.toggle('visible',
     !aircraft.crashed && !aircraft.onGround && nearestTraffic < 300);
+  el.hits.textContent = hits;
 }
 
 export function showMessage(title, subtitle = '', durationMs = 0) {
